@@ -3,7 +3,9 @@ package com.codelabs.config;
 import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.ClientHttpRequestInterceptor;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.http.client.support.HttpRequestWrapper;
 import org.springframework.web.client.RestTemplate;
 
@@ -15,22 +17,18 @@ import java.net.URISyntaxException;
 public class RestTemplateConfig {
 
     private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
+    private static final int TIMEOUT = 5000; // Timeout in milliseconds (5 seconds)
 
     @Bean
     public RestTemplate restTemplate(RestTemplateCustomizer customizer) {
-        RestTemplate restTemplate = new RestTemplate();
+        RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
         customizer.customize(restTemplate);
         return restTemplate;
     }
 
     @Bean
     public RestTemplateCustomizer restTemplateCustomizer() {
-        return new RestTemplateCustomizer() {
-            @Override
-            public void customize(RestTemplate restTemplate) {
-                restTemplate.getInterceptors().add(baseUrlInterceptor());
-            }
-        };
+        return restTemplate -> restTemplate.getInterceptors().add(baseUrlInterceptor());
     }
 
     private ClientHttpRequestInterceptor baseUrlInterceptor() {
@@ -49,5 +47,12 @@ public class RestTemplateConfig {
             }
             return execution.execute(request, body);
         };
+    }
+
+    private ClientHttpRequestFactory clientHttpRequestFactory() {
+        SimpleClientHttpRequestFactory factory = new SimpleClientHttpRequestFactory();
+        factory.setConnectTimeout(TIMEOUT); // Set connection timeout
+        factory.setReadTimeout(TIMEOUT); // Set read timeout
+        return factory;
     }
 }
