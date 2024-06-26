@@ -17,6 +17,13 @@ public class RestTemplateConfig {
     private static final String BASE_URL = "https://jsonplaceholder.typicode.com";
 
     @Bean
+    public RestTemplate restTemplate(RestTemplateCustomizer customizer) {
+        RestTemplate restTemplate = new RestTemplate();
+        customizer.customize(restTemplate);
+        return restTemplate;
+    }
+
+    @Bean
     public RestTemplateCustomizer restTemplateCustomizer() {
         return new RestTemplateCustomizer() {
             @Override
