@@ -1,5 +1,6 @@
 package com.codelabs.config;
 
+import com.codelabs.exception.CustomResponseErrorHandler;
 import org.springframework.boot.web.client.RestTemplateCustomizer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -23,6 +24,9 @@ public class RestTemplateConfig {
     public RestTemplate restTemplate(RestTemplateCustomizer customizer) {
         RestTemplate restTemplate = new RestTemplate(clientHttpRequestFactory());
         customizer.customize(restTemplate);
+
+        CustomResponseErrorHandler errorHandler = new CustomResponseErrorHandler();
+        restTemplate.setErrorHandler(errorHandler);
         return restTemplate;
     }
 
